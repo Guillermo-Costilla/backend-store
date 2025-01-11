@@ -1,9 +1,10 @@
 import { Schema, model, Types } from "mongoose";
 import bcrypt from "bcryptjs";
 
-const collection = 'users';
+const collection = "users";
 
-const schema = new Schema({
+const schema = new Schema(
+  {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -12,19 +13,22 @@ const schema = new Schema({
     country: { type: String },
     online: { type: Boolean, default: false },
     verified: { type: Boolean, default: true },
-    verified_code: { type: String }
-
-}, {
-    timestamps: true
-});
+    verified_code: { type: String },
+    products: { type: Types.ObjectId, ref: "products" },
+    orders: { type: Types.ObjectId, ref: "orders" },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 // Encriptar la contraseña antes de guardar
-schema.pre('save', async function(next) {
-    if (this.isModified('password')) {
-        const salt = await bcrypt.genSalt(10);
-        this.password = await bcrypt.hash(this.password, salt);
-    }
-    next();
+schema.pre("save", async function (next) {
+  if (this.isModified("password")) {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+  }
+  next();
 });
 
 const User = model(collection, schema);
